@@ -45,21 +45,25 @@ resource "aws_s3_bucket_lifecycle_configuration" "tf_s3_bkt_lifecycle" {
       prefix = ""
     }
 
+    # Transition to Standard-IA after 30 days
     transition {
       days          = 30
       storage_class = "STANDARD_IA"
     }
 
+    # Transition to Glacier Flexible Retrieval after 60 days
     transition {
       days          = 60
       storage_class = "GLACIER"
     }
 
+    # Transition to Glacier Deep Archive after 150 days (GLACIER + 90)
     transition {
-      days          = 120
+      days          = 150
       storage_class = "DEEP_ARCHIVE"
     }
 
+    # Expire after 365 days
     expiration {
       days = 365
     }
