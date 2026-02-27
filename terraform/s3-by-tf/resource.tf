@@ -8,15 +8,15 @@ resource "aws_s3_bucket" "tf_bkt" {
 }
 
 resource "aws_s3_bucket_versioning" "versioning" {
-  bucket = aws_s3_bucket.my_bucket.id
+  bucket = aws_s3_bucket.tf_bkt.id
 
-  versioning_configuration {
+  versioning {
     status = "Enabled"
   }
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "encryption" {
-  bucket = aws_s3_bucket.my_bucket.id
+  bucket = aws_s3_bucket.tf_bkt.id
 
   rule {
     apply_server_side_encryption_by_default {
@@ -26,7 +26,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "encryption" {
 }
 
 resource "aws_s3_bucket_public_access_block" "block_public" {
-  bucket = aws_s3_bucket.my_bucket.id
+  bucket = aws_s3_bucket.tf_bkt.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -35,7 +35,7 @@ resource "aws_s3_bucket_public_access_block" "block_public" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "tf_s3_bkt_lifecycle" {
-  bucket = aws_s3_bucket.tf_s3_bkt.id
+  bucket = aws_s3_bucket.tf_bkt.id
 
   rule {
     id     = "expire-objects"
@@ -57,7 +57,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "tf_s3_bkt_lifecycle" {
       storage_class = "GLACIER"
     }
 
-    # Optional: Transition to Glacier Deep Archive after 120 days
+    # Transition to Glacier Deep Archive after 120 days
     transition {
       days          = 120
       storage_class = "DEEP_ARCHIVE"
