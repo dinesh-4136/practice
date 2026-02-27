@@ -21,7 +21,6 @@ resource "aws_instance" "tf_ec2" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.instance_type
   key_name               = var.key_pair
-  subnet_id              = data.aws_subnet.default.id
   vpc_security_group_ids = [aws_security_group.tf_sg.id]
 
   user_data = <<-EOF
