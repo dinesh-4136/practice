@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "ap-south-1"
-}
-
 resource "aws_s3_bucket" "tf_bkt" {
   bucket = "tf-s3-bkt-state-backup-a2"
 
