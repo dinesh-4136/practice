@@ -67,4 +67,5 @@ resource "aws_s3_bucket_lifecycle_configuration" "tf_s3_bkt_lifecycle" {
     expiration {
       days = 365
     }
+  }
 }
