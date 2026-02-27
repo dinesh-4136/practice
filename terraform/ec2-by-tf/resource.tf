@@ -7,6 +7,7 @@ resource "aws_security_group" "tf_sg" {
         to_port = 22
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
+    }
 
     egress {
         from_port = 0
@@ -18,8 +19,8 @@ resource "aws_security_group" "tf_sg" {
 
 resource "aws_instance" "tf_ec2" {
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = var.instance-type
-  key_name               = var.key-pair
+  instance_type          = var.instance_type
+  key_name               = var.key_pair
   subnet_id              = data.aws_subnet.default.id
   vpc_security_group_ids = [aws_security_group.tf_sg.id]
 
