@@ -70,7 +70,7 @@ resource "aws_eip" "nat_eip" {
 # Create NAT Gateway in public subnet
 resource "aws_nat_gateway" "nat_gw" {
     allocation_id = aws_eip.nat_eip.id
-    subnet_id = aws_subnet.public-1.id
+    subnet_id = aws_subnet.public_1.id
 
     depends_on = [aws_internet_gateway.igw]
 
@@ -108,7 +108,7 @@ resource "aws_route_table" "private_rt" {
     vpc_id = aws_vpc.main.id
 
     route {
-        cidr_blcok = var.private_rt_cidr_block
+        cidr_block = var.private_rt_cidr_block
         nat_gateway_id = aws_nat_gateway.nat_gw.id
     }
 
