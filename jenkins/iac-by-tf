@@ -1,0 +1,92 @@
+pipeline {
+    agent any
+    
+    parameters {
+        choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Choose Terraform action')
+        string(name: 'TERRAFORM_DIR', defaultValue: 'terraform/', description: 'Enter Terraform Directory path')
+        string(name: 'AWS_REGION', defaultValue: 'ap-south-1', description: 'Enter AWS region to deploy')
+    }
+    
+    stages {
+        stage("Git Checkout") {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/dinesh-4136/practice.git'
+            }
+        }
+        
+        stage("Terraform Init") {
+            steps {
+                dir("${params.TERRAFORM_DIR}") {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+                        sh """
+                        export AWS_DEFAULT_REGION=${params.AWS_REGION}
+                        terraform init
+                        """
+                    }
+                }
+            }
+        }
+        
+        stage("Terraform Validate") {
+            when {
+                expression { params.ACTION == 'apply' }
+            }
+            steps {
+                dir("${params.TERRAFORM_DIR}") {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+                        sh """
+                        export AWS_DEFAULT_REGION=${params.AWS_REGION}
+                        terraform validate
+                        """
+                    }
+                }
+            }
+        }
+        
+        stage("Terraform Plan") {
+            when {
+                expression { params.ACTION == 'apply' }
+            }
+            steps {
+                dir("${params.TERRAFORM_DIR}") {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+                        sh """
+                        export AWS_DEFAULT_REGION=${params.AWS_REGION}
+                        terraform plan -out=tfplan
+                        """
+                    }
+                }
+            }
+        }
+        
+        stage("Terraform Apply/Destroy") {
+            steps {
+                dir("${params.TERRAFORM_DIR}") {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+                        sh """
+                        export AWS_DEFAULT_REGION=${params.AWS_REGION}
+                        if [ "${params.ACTION}" = "apply" ]; then
+                            terraform apply -auto-approve tfplan
+                        else
+                            terraform destroy -auto-approve
+                        fi
+                        """
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo "Pipeline execution completed."
+        }
+        success {
+            echo "Terraform ${params.ACTION} successful!"
+        }
+        failure {
+            echo "Pipeline failed!"
+        }
+    }
+}
